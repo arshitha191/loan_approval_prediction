@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loan Approval Prediction</title>
+  <style>
+    body {
+      background-color: #121212;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #f0f0f0;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00bfff;
+      margin-top: 30px;
+      font-size: 28px;
+    }
+
+    .main-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      margin-top: 20px;
+    }
+
+    .container {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px 3px rgba(0, 191, 255, 0.4);
+      border: 1px solid #00bfff;
+      width: 400px;
+    }
+
+    .container:hover {
+      box-shadow: 0 0 18px 6px rgba(0, 191, 255, 0.6);
+    }
+
+    form {
+      width: 100%;
+    }
+
+    .form-group {
+      border-bottom: 1px solid #333;
+      padding: 10px 0;
+      margin-bottom: 10px;
+    }
+
+    .form-group:last-child {
+      border-bottom: none;
+    }
+
+    label {
+      font-size: 14px;
+      color: #ccc;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: #2a2a2a;
+      color: #f0f0f0;
+    }
+
+    button {
+      background-color: #00bfff;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #009ccc;
+    }
+
+    #result {
+      font-size: 18px;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      margin-top: 15px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    #result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .approved {
+      color: #00ff88;
+    }
+
+    .rejected {
+      color: #ff4c4c;
+    }
+
+    .icon {
+      font-size: 20px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Loan Approval Prediction</h1>
+
+  <div class="main-wrapper">
+    <div class="container">
+      <form id="loan-form">
+        <div class="form-group">
+          <label for="Gender">Gender</label>
+          <select id="Gender">
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="Married">Married</label>
+          <select id="Married">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="Dependents">Dependents</label>
+          <select id="Dependents">
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="Education">Education</label>
+          <select id="Education">
+            <option>Graduate</option>
+            <option>Not Graduate</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="Self_Employed">Self Employed</label>
+          <select id="Self_Employed">
+            <option>No</option>
+            <option>Yes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ApplicantIncome">Applicant Income</label>
+          <input type="number" id="ApplicantIncome" required>
+        </div>
+        <div class="form-group">
+          <label for="CoapplicantIncome">Coapplicant Income</label>
+          <input type="number" id="CoapplicantIncome" required>
+        </div>
+        <div class="form-group">
+          <label for="LoanAmount">Loan Amount</label>
+          <input type="number" id="LoanAmount" required>
+        </div>
+        <div class="form-group">
+          <label for="Loan_Amount_Term">Loan Term (in days)</label>
+          <input type="number" id="Loan_Amount_Term" value="360" required>
+        </div>
+        <div class="form-group">
+          <label for="Credit_History">Credit History</label>
+          <select id="Credit_History">
+            <option value="1">1</option>
+            <option value="0">0</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="Property_Area">Property Area</label>
+          <select id="Property_Area">
+            <option>Urban</option>
+            <option>Semiurban</option>
+            <option>Rural</option>
+          </select>
+        </div>
+
+        <button type="submit">Predict Loan Approval</button>
+        <div id="result"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loan-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const data = {
+        Gender: document.getElementById('Gender').value,
+        Married: document.getElementById('Married').value,
+        Dependents: document.getElementById('Dependents').value,
+        Education: document.getElementById('Education').value,
+        Self_Employed: document.getElementById('Self_Employed').value,
+        ApplicantIncome: document.getElementById('ApplicantIncome').value,
+        CoapplicantIncome: document.getElementById('CoapplicantIncome').value,
+        LoanAmount: document.getElementById('LoanAmount').value,
+        Loan_Amount_Term: document.getElementById('Loan_Amount_Term').value,
+        Credit_History: document.getElementById('Credit_History').value,
+        Property_Area: document.getElementById('Property_Area').value
+      };
+
+      const response = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      const resultDiv = document.getElementById('result');
+
+      const icon = result.prediction.toLowerCase() === 'approved' ? '✔️' : '❌';
+      const className = result.prediction.toLowerCase() === 'approved' ? 'approved' : 'rejected';
+
+      resultDiv.innerHTML = `<span class="icon">${icon}</span> Prediction: ${result.prediction}`;
+      resultDiv.className = `show ${className}`;
+    });
+  </script>
+</body>
+</html>
